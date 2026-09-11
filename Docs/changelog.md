@@ -10,6 +10,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/) · Version: `SemVer`
 - `Core/AudioManager.cs` — BGM/SFX tách 2 AudioSource, mute + volume lưu PlayerPrefs, fade BGM
 - `Core/SaveManager.cs` + `Core/SaveData.cs` — save JSON atomic có .bak, autosave lúc mất focus, hook migrate theo version
 - `Core/SceneLoader.cs` — LoadSceneAsync + loading screen dựng bằng code, fade, min duration, reset timeScale
+- Scene demo `Demo_Core` + menu `HC Template > Dựng scene demo Core` để test 4 hệ thống Core (xoá khi làm game thật)
 
 ### Changed
 ### Fixed

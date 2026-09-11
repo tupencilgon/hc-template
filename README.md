@@ -154,6 +154,25 @@ Lưu ý:
 - Màn loading cố tình tối giản, đủ cho gray-box. Sang Giai đoạn 4 thay hàm `BuildLoadingScreen()` bằng UI thật
 - Dùng font dựng sẵn của Unity nên không cần import asset — đổi lại không kiểm soát được kiểu chữ
 
+## Scene demo (test các hệ thống Core)
+
+Menu **HC Template > Dựng scene demo Core** → tạo `Assets/_Project/Scenes/Demo_Core.unity`, tự thêm vào Build Settings → bấm Play.
+
+Scene sinh toàn bộ bằng code (UI, cube, âm thanh) nên không phụ thuộc asset nào. Checklist cần thấy:
+
+| Bấm | Phải thấy | Chứng minh |
+|---|---|---|
+| Spawn 1 cube | Cube rơi xuống + tiếng bíp; "Cube rảnh trong pool" giảm rồi 2s sau tăng lại | ObjectPool `Get`/`Return` |
+| Spawn 20 cube 1 lúc | 20 cube rơi, tiếng bíp vẫn **1 tiếng gọn** chứ không vỡ | Pool chịu tải + chống phát dồn SFX |
+| Tắt tiếng → Play lại | Mở lại vẫn đang tắt tiếng | Mute lưu PlayerPrefs |
+| +10 coins → Stop → Play lại | Coins giữ nguyên | SaveManager ghi ra file thật |
+| Reload scene | Màn loading fade vào, bar chạy đầy rồi fade ra; coins giữ nguyên, "spawn trong phiên này" về 0 | SceneLoader + save sống qua scene |
+| Xoá save | Coins về 0 | `SaveManager.Delete()` |
+
+Đường dẫn file save hiện ngay trên màn hình — mở ra xem JSON thật để chắc chắn.
+
+**Khi bắt đầu game thật:** xoá `Assets/_Project/Scripts/Demo/`, `Assets/_Project/Scripts/Editor/DemoSceneBuilder.cs` và scene `Demo_Core`.
+
 ## Bắt đầu game mới
 
 1. Clone repo này → đổi tên thành `hc-<genre>-<tên-ngắn>`
