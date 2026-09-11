@@ -35,7 +35,7 @@ Docs/
 - [ ] Analytics wrapper (Firebase + GameAnalytics): `level_start`, `level_complete`, `level_fail`, `ad_shown`, `ad_reward_claimed`
 - [x] Object pooling system (`Scripts/Core/ObjectPool.cs`)
 - [x] Audio Manager (`Scripts/Core/AudioManager.cs`)
-- [ ] Scene loader + loading screen
+- [x] Scene loader + loading screen (`Scripts/Core/SceneLoader.cs`)
 - [ ] Settings / Pause menu skeleton (chốt 1 chuẩn UI: uGUI hoặc UI Toolkit, dùng xuyên suốt)
 - [x] Save/load system (`Scripts/Core/SaveManager.cs` + `SaveData.cs`)
 - [ ] IAP hook (Unity IAP) — cắm sẵn nhưng **tắt**
@@ -134,6 +134,25 @@ Lưu ý:
 - Đổi cấu trúc `SaveData` không tương thích ngược thì tăng `SaveData.CurrentVersion` và thêm nhánh trong `SaveManager.Migrate()`
 - `JsonUtility` không serialize được property, Dictionary, hay `int?` — chỉ dùng field public trong `SaveData`
 - Save là **plain text, người chơi sửa được**. Chỉ mã hoá khi game có IAP và việc gian lận thực sự ảnh hưởng doanh thu
+
+## Scene Loader
+
+Namespace: `HC.Core`. `LoadSceneAsync` + màn hình loading (Canvas + progress bar) dựng bằng code — không cần prefab, không cần kéo thả gì.
+
+```csharp
+using HC.Core;
+
+SceneLoader.Instance.LoadScene("Level_01");
+SceneLoader.Instance.LoadScene("Level_02", () => Debug.Log("vào scene rồi"));
+SceneLoader.Instance.ReloadScene();   // nút Restart/Retry
+```
+
+Lưu ý:
+- Scene phải có trong **Build Settings** (`File > Build Profiles > Scene List`), không thì báo lỗi rõ ràng ngay chứ không crash khó hiểu
+- Tự `Time.timeScale = 1` khi vào scene mới — pause menu set `timeScale = 0` rồi bấm Restart mà quên reset thì scene mới đứng hình
+- `minimumDuration` 0.6s giữ màn loading đủ lâu: scene gray-box load xong trong 2 frame, không có mốc này thì màn loading chớp một cái rất khó chịu
+- Màn loading cố tình tối giản, đủ cho gray-box. Sang Giai đoạn 4 thay hàm `BuildLoadingScreen()` bằng UI thật
+- Dùng font dựng sẵn của Unity nên không cần import asset — đổi lại không kiểm soát được kiểu chữ
 
 ## Bắt đầu game mới
 
