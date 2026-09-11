@@ -37,7 +37,7 @@ Docs/
 - [x] Audio Manager (`Scripts/Core/AudioManager.cs`)
 - [ ] Scene loader + loading screen
 - [ ] Settings / Pause menu skeleton (chốt 1 chuẩn UI: uGUI hoặc UI Toolkit, dùng xuyên suốt)
-- [ ] Save/load system (JSON, chưa cần cloud)
+- [x] Save/load system (`Scripts/Core/SaveManager.cs` + `SaveData.cs`)
 - [ ] IAP hook (Unity IAP) — cắm sẵn nhưng **tắt**
 - [ ] Debug overlay: FPS + draw call counter
 - [x] `.gitignore` chuẩn Unity + folder structure
@@ -106,6 +106,34 @@ Lưu ý:
 - Có mute tổng (`ToggleMute`) và mute riêng nhạc/SFX — settings menu thường cần cả hai
 - Cùng 1 clip gọi dồn trong 40ms bị bỏ qua (`sfxRetriggerCooldown`), tránh 20 đồng xu cùng frame làm vỡ tiếng
 - Fade BGM chạy bằng `unscaledDeltaTime` nên vẫn mượt khi pause menu set `Time.timeScale = 0`
+
+## Save / Load
+
+Namespace: `HC.Core`. File JSON ở `Application.persistentDataPath/save.json`. `SaveManager` là static — không cần gắn vào GameObject.
+
+```csharp
+using HC.Core;
+
+// Đọc (lần gọi đầu tự load từ file, sau đó dùng bản cache)
+int coins = SaveManager.Data.coins;
+
+// Ghi
+SaveManager.Data.coins += 10;
+SaveManager.Data.highScore = Mathf.Max(SaveManager.Data.highScore, score);
+SaveManager.Save();
+
+SaveManager.Delete();   // nút "Reset progress"
+```
+
+Thêm field cho game mới: sửa thẳng [SaveData.cs](Assets/_Project/Scripts/Core/SaveData.cs), `SaveManager` không cần đụng tới.
+
+Lưu ý:
+- Tự save khi app mất focus (bấm Home) và lúc quit — trên mobile `OnApplicationQuit` thường không chạy vì OS kill thẳng app
+- Ghi atomic (file `.tmp` → thay thế) + giữ 1 bản `.bak`: tắt máy giữa lúc ghi không mất sạch tiến trình
+- File hỏng → tự thử `.bak` → hỏng nốt thì trả `SaveData` mặc định, **không bao giờ trả null hay ném exception**
+- Đổi cấu trúc `SaveData` không tương thích ngược thì tăng `SaveData.CurrentVersion` và thêm nhánh trong `SaveManager.Migrate()`
+- `JsonUtility` không serialize được property, Dictionary, hay `int?` — chỉ dùng field public trong `SaveData`
+- Save là **plain text, người chơi sửa được**. Chỉ mã hoá khi game có IAP và việc gian lận thực sự ảnh hưởng doanh thu
 
 ## Bắt đầu game mới
 
