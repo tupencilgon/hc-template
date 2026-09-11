@@ -34,7 +34,7 @@ Docs/
 - [ ] Ad mediation (AppLovin MAX): interstitial / rewarded / banner wire sẵn, chỉ đổi Ad Unit ID
 - [ ] Analytics wrapper (Firebase + GameAnalytics): `level_start`, `level_complete`, `level_fail`, `ad_shown`, `ad_reward_claimed`
 - [x] Object pooling system (`Scripts/Core/ObjectPool.cs`)
-- [ ] Audio Manager (mute/unmute, lưu qua PlayerPrefs)
+- [x] Audio Manager (`Scripts/Core/AudioManager.cs`)
 - [ ] Scene loader + loading screen
 - [ ] Settings / Pause menu skeleton (chốt 1 chuẩn UI: uGUI hoặc UI Toolkit, dùng xuyên suốt)
 - [ ] Save/load system (JSON, chưa cần cloud)
@@ -77,6 +77,35 @@ Lưu ý:
 - `Return()` một object không thuộc pool nào → bị **Destroy** kèm warning (để `Return` luôn đúng nghĩa "dọn đi")
 - `IPoolable` được cache lúc tạo instance → 0 byte GC mỗi lần spawn, nhưng component thêm lúc runtime sẽ không được gọi callback
 - `maxSize > 0` thì pool đầy sẽ Destroy bớt thay vì phình bộ nhớ vô hạn
+
+## Audio Manager
+
+Namespace: `HC.Core`. 2 AudioSource tách biệt — BGM (loop) và SFX (one-shot chồng nhau được).
+
+```csharp
+using HC.Core;
+
+AudioManager.Instance.PlayBGM(levelMusic);          // fade mặc định 0.5s, gọi lại cùng clip thì không restart
+AudioManager.Instance.PlaySFX(coinClip);
+AudioManager.Instance.PlaySFX(explosionClip, 0.6f); // nhỏ tiếng hơn
+
+bool muted = AudioManager.Instance.ToggleMute();    // nút loa trên HUD, tự lưu PlayerPrefs
+AudioManager.Instance.MusicVolume = 0.4f;           // slider trong Settings
+AudioManager.Instance.ToggleSfx();                  // mute riêng SFX
+```
+
+UI settings đồng bộ lại khi state đổi:
+
+```csharp
+void OnEnable()  => AudioManager.Instance.OnAudioSettingsChanged += Refresh;
+void OnDisable() { if (AudioManager.Instance != null) AudioManager.Instance.OnAudioSettingsChanged -= Refresh; }
+```
+
+Lưu ý:
+- Mute/volume lưu PlayerPrefs (`audio.*`), tự load lại lúc mở game
+- Có mute tổng (`ToggleMute`) và mute riêng nhạc/SFX — settings menu thường cần cả hai
+- Cùng 1 clip gọi dồn trong 40ms bị bỏ qua (`sfxRetriggerCooldown`), tránh 20 đồng xu cùng frame làm vỡ tiếng
+- Fade BGM chạy bằng `unscaledDeltaTime` nên vẫn mượt khi pause menu set `Time.timeScale = 0`
 
 ## Bắt đầu game mới
 
