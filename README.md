@@ -31,8 +31,8 @@ Docs/
 
 ## Checklist boilerplate
 
-- [ ] Ad mediation (AppLovin MAX): interstitial / rewarded / banner wire sẵn, chỉ đổi Ad Unit ID
-- [ ] Analytics wrapper (Firebase + GameAnalytics): `level_start`, `level_complete`, `level_fail`, `ad_shown`, `ad_reward_claimed`
+- [ ] Ad mediation (AppLovin MAX) — hoãn lại, xem [Docs/quy-trinh-build-game.md](Docs/quy-trinh-build-game.md) mục 5
+- [~] Analytics wrapper (`Scripts/Analytics/`) — tầng facade + 5 event chuẩn đã xong; provider Firebase/GameAnalytics chờ cài SDK
 - [x] Object pooling system (`Scripts/Core/ObjectPool.cs`)
 - [x] Audio Manager (`Scripts/Core/AudioManager.cs`)
 - [x] Scene loader + loading screen (`Scripts/Core/SceneLoader.cs`)
@@ -172,6 +172,38 @@ Scene sinh toàn bộ bằng code (UI, cube, âm thanh) nên không phụ thuộ
 Đường dẫn file save hiện ngay trên màn hình — mở ra xem JSON thật để chắc chắn.
 
 **Khi bắt đầu game thật:** xoá `Assets/_Project/Scripts/Demo/`, `Assets/_Project/Scripts/Editor/DemoSceneBuilder.cs` và scene `Demo_Core`.
+
+## Analytics
+
+Namespace: `HC.Analytics`. Gameplay **chỉ gọi `AnalyticsManager`**, không gọi thẳng SDK.
+
+```csharp
+using HC.Analytics;
+
+// Bootstrap, gọi 1 lần lúc mở game
+AnalyticsManager.AddProvider(new DebugAnalyticsProvider());
+// AnalyticsManager.AddProvider(new FirebaseAnalyticsProvider());   // khi đã cài SDK
+AnalyticsManager.Initialize();
+
+// Trong gameplay — 5 event chuẩn, dùng chung cho mọi game
+AnalyticsManager.LevelStart(levelIndex);
+AnalyticsManager.LevelComplete(levelIndex, durationSeconds, score);
+AnalyticsManager.LevelFail(levelIndex, durationSeconds, "hit_obstacle");
+AnalyticsManager.AdShown("rewarded", "revive");
+AnalyticsManager.AdRewardClaimed("revive");
+
+// Event riêng của game
+AnalyticsManager.LogEvent("boost_used", "type", "rocket");
+```
+
+Lưu ý:
+- Chưa cài SDK vẫn gắn event được — `DebugAnalyticsProvider` in ra Console. Cắm SDK sau **không phải sửa gameplay**
+- Event bắn trước khi SDK init xong được xếp hàng chờ và gửi bù, không mất
+- Tên event sai định dạng bị Firebase **bỏ lặng lẽ ở server**; wrapper check ngay lúc dev và báo lỗi rõ
+- `SetConsent(false)` chặn toàn bộ thu thập dữ liệu — bắt buộc xử lý nếu phát hành ở EU
+- Tắt `AnalyticsManager.VerboseLogging` ở bản release
+
+Thuật ngữ, quy trình đăng ký Firebase/GameAnalytics, và lý do hoãn AppLovin: xem [Docs/quy-trinh-build-game.md](Docs/quy-trinh-build-game.md).
 
 ## Bắt đầu game mới
 

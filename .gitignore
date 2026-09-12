@@ -88,3 +88,29 @@ GoogleService-Info.plist
 *.jks
 keystore.properties
 Assets/_Project/Resources/AdConfig.local.asset
+
+# ---------------------------------------------------------
+# SDK bên thứ 3 — KHÔNG commit
+# Firebase chứa file 107MB, vượt giới hạn 100MB/file của GitHub.
+# Import lại bằng .unitypackage theo đúng version ghi trong README.
+# ---------------------------------------------------------
+/[Aa]ssets/Firebase/
+/[Aa]ssets/Firebase.meta
+/[Aa]ssets/GameAnalytics/
+/[Aa]ssets/GameAnalytics.meta
+/[Aa]ssets/ExternalDependencyManager/
+/[Aa]ssets/ExternalDependencyManager.meta
+/[Aa]ssets/Editor Default Resources/
+/[Aa]ssets/Editor Default Resources.meta
+/[Aa]ssets/Plugins/Android/
+/[Aa]ssets/Plugins/Android.meta
+/[Aa]ssets/Plugins/iOS/
+/[Aa]ssets/Plugins/iOS.meta
+/[Aa]ssets/Plugins/tvOS/
+/[Aa]ssets/Plugins/tvOS.meta
+/[Aa]ssets/Plugins/x86_64/
+/[Aa]ssets/Plugins/x86_64.meta
+
+# Key GameAnalytics nằm trong file này — không đẩy lên repo công khai
+/[Aa]ssets/Resources/GameAnalytics/
+/[Aa]ssets/Resources/GameAnalytics.meta
