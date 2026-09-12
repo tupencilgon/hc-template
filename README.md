@@ -32,14 +32,14 @@ Docs/
 ## Checklist boilerplate
 
 - [ ] Ad mediation (AppLovin MAX) — hoãn lại, xem [Docs/quy-trinh-build-game.md](Docs/quy-trinh-build-game.md) mục 5
-- [~] Analytics wrapper (`Scripts/Analytics/`) — tầng facade + 5 event chuẩn đã xong; provider Firebase/GameAnalytics chờ cài SDK
+- [x] Analytics wrapper (`Scripts/Analytics/`) — Firebase 13.16.0 + GameAnalytics 8.2.0 đã cắm
 - [x] Object pooling system (`Scripts/Core/ObjectPool.cs`)
 - [x] Audio Manager (`Scripts/Core/AudioManager.cs`)
 - [x] Scene loader + loading screen (`Scripts/Core/SceneLoader.cs`)
-- [ ] Settings / Pause menu skeleton (chốt 1 chuẩn UI: uGUI hoặc UI Toolkit, dùng xuyên suốt)
+- [x] Settings / Pause menu (`Scripts/UI/PauseMenu.cs`) — chuẩn UI đã chốt: **uGUI**
 - [x] Save/load system (`Scripts/Core/SaveManager.cs` + `SaveData.cs`)
 - [ ] IAP hook (Unity IAP) — cắm sẵn nhưng **tắt**
-- [ ] Debug overlay: FPS + draw call counter
+- [x] Debug overlay FPS + draw call (`Scripts/Core/DebugOverlay.cs`)
 - [x] `.gitignore` chuẩn Unity + folder structure
 
 ## Object Pool
@@ -196,14 +196,44 @@ AnalyticsManager.AdRewardClaimed("revive");
 AnalyticsManager.LogEvent("boost_used", "type", "rocket");
 ```
 
+Ba provider được `GameBootstrap` tự đăng ký lúc mở game, không phải gọi tay:
+Debug (Console) · Firebase · GameAnalytics.
+
 Lưu ý:
-- Chưa cài SDK vẫn gắn event được — `DebugAnalyticsProvider` in ra Console. Cắm SDK sau **không phải sửa gameplay**
+- **SDK không nằm trong Git.** Code gọi SDK nằm sau `#if HC_FIREBASE` / `#if HC_GAMEANALYTICS`, `SdkDefines.cs` tự bật define khi thấy SDK → clone về máy chưa có SDK vẫn build được ngay. Xem [Docs/setup-may-moi.md](Docs/setup-may-moi.md)
+- Menu **HC Template → Kiểm tra setup** soi 6 mục cấu hình và chỉ ra chỗ thiếu, gồm cả lỗi lệch package name (lỗi này Firebase im lặng nuốt event, không báo gì)
+- GameAnalytics nhận 5 event chuẩn dưới dạng progression/ad event đúng chuẩn của nó, nên phễu theo màn chơi trên dashboard chạy được ngay
+- Firebase Analytics **không chạy trong Unity Editor** — chỉ có trên máy Android thật
 - Event bắn trước khi SDK init xong được xếp hàng chờ và gửi bù, không mất
 - Tên event sai định dạng bị Firebase **bỏ lặng lẽ ở server**; wrapper check ngay lúc dev và báo lỗi rõ
 - `SetConsent(false)` chặn toàn bộ thu thập dữ liệu — bắt buộc xử lý nếu phát hành ở EU
 - Tắt `AnalyticsManager.VerboseLogging` ở bản release
 
 Thuật ngữ, quy trình đăng ký Firebase/GameAnalytics, và lý do hoãn AppLovin: xem [Docs/quy-trinh-build-game.md](Docs/quy-trinh-build-game.md).
+
+## Pause menu & Debug overlay
+
+```csharp
+using HC.UI;
+
+// Chạm vào Instance là nút pause hiện ở góc trên phải
+_ = PauseMenu.Instance;
+
+PauseMenu.Instance.ShowPauseButton(false);              // scene menu chính thì ẩn nút đi
+PauseMenu.Instance.OnPauseChanged += paused => { ... }; // gameplay tự khoá input khi paused
+```
+
+Pause menu:
+- Esc trên máy tính và nút Back cứng trên Android cùng vào một chỗ
+- Bấm Home giữa màn chơi → tự pause, quay lại không bị chết oan
+- Nhớ lại `Time.timeScale` cũ thay vì mặc định trả về 1 — game đang chạy slow-motion vẫn đúng
+- Nút Nhạc/Âm thanh nối thẳng vào `AudioManager`, nút Chơi lại nối vào `SceneLoader`
+
+Debug overlay — **chạm 3 lần vào góc trên trái**, hoặc **F3**:
+- FPS hiện tại + **FPS thấp nhất** (con số đáng quan tâm hơn cả, bỏ qua 3 giây đầu lúc đang nạp asset)
+- Draw call, SetPass call, tam giác, bộ nhớ
+- Đọc bằng `ProfilerRecorder` nên **chạy được trên development build trên máy thật**, không chỉ trong Editor
+- Tự dựng lúc mở game, chỉ ở Editor và development build — bản release không có gì để quên tắt
 
 ## Bắt đầu game mới
 

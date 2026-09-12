@@ -170,9 +170,9 @@ PlayerSettings:
   androidMaxAspectRatio: 2.4
   androidMinAspectRatio: 1
   applicationIdentifier:
-    Android: com.UnityTechnologies.com.unity.template.urpblank
+    Android: com.tastudio.hctemplate
     Standalone: com.Unity-Technologies.com.unity.template.urp-blank
-    iPhone: com.Unity-Technologies.com.unity.template.urp-blank
+    iPhone: com.tastudio.hctemplate
   buildNumber:
     Standalone: 0
     VisionOS: 0
@@ -564,6 +564,9 @@ PlayerSettings:
   - serializedVersion: 3
     m_BuildTarget: Android
     m_Formats: 03000000
+  - serializedVersion: 3
+    m_BuildTarget: iOS
+    m_Formats: 03000000
   playModeTestRunnerEnabled: 0
   runPlayModeTestAsEditModeTest: 0
   actionOnDotNetUnhandledException: 1
@@ -829,7 +832,10 @@ PlayerSettings:
   webGLCloseOnQuit: 0
   webWasm2023: 0
   webEnableSubmoduleStrippingCompatibility: 0
-  scriptingDefineSymbols: {}
+  scriptingDefineSymbols:
+    Android: HC_FIREBASE;HC_GAMEANALYTICS
+    Standalone: HC_FIREBASE;HC_GAMEANALYTICS
+    iPhone: HC_FIREBASE;HC_GAMEANALYTICS
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:

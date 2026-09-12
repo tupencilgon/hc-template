@@ -4,6 +4,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
 using UnityEngine.UI;
 using HC.Core;
+using HC.UI;
 
 namespace HC.Demo
 {
@@ -47,6 +48,10 @@ namespace HC.Demo
             }
 
             AudioManager.Instance.PlayBGM(_bgmClip);
+
+            // Chạm vào Instance là PauseMenu tự dựng nút pause ở góc trên phải.
+            // Scene menu chính thì gọi ShowPauseButton(false) để ẩn đi.
+            _ = PauseMenu.Instance;
 
             RefreshStatus();
         }

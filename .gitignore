@@ -114,3 +114,9 @@ Assets/_Project/Resources/AdConfig.local.asset
 # Key GameAnalytics nằm trong file này — không đẩy lên repo công khai
 /[Aa]ssets/Resources/GameAnalytics/
 /[Aa]ssets/Resources/GameAnalytics.meta
+
+# Meta của file/thư mục đã bị chặn ở trên — giữ lại chỉ tạo meta mồ côi
+/[Aa]ssets/google-services.json.meta
+/[Aa]ssets/Resources.meta
+/[Aa]ssets/StreamingAssets/
+/[Aa]ssets/StreamingAssets.meta
